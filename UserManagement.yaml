@@ -1,0 +1,217 @@
+openapi: 3.0.1
+info:
+  title: User Registration
+  description: This Service is used to Register Users
+  contact:
+    email: gouravbansal11@gmail.com
+  version: 1.0.0
+servers:
+- url: 'https://{serverHostName}/userManagement/{version}'
+  description: Server URLs
+  variables:
+    serverHostName:
+      default: 'VaamanServer'
+      description: Server host name.
+    version:
+      enum:
+      - 'v1'
+      default: 'v1'
+tags:
+- name: userManagement
+  description: Manage Operation related to User
+paths:
+  /user/tenant/{tenantId}:
+    parameters:
+    - $ref: '#/components/parameters/basePathParam'
+    post:
+      tags:
+      - creatorUser
+      summary: create a new User.
+      operationId: createUser
+      requestBody:
+        content:
+          application/json;charset=utf-8:
+            schema:
+              type: array
+              items:
+                $ref: '#/components/requestBodies/User'
+      responses:
+        '200':
+          description: |
+            *Success* - User Created Successfully.
+          content:
+            application/json;charset=utf-8:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/User'
+        '400':
+          description: >
+            *Bad Request* - The server cannot process the request due to a
+            malformed
+                  syntax. The response can be caused by missing mandatory query
+                  parameters, invalid value in the query parameters, validation
+                  exceptions, and so on.
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/responses/ErrorResponse'
+        '404':
+          description: >
+            *Not Found* - The server did not find anything matching the request
+            URI.
+
+            The response can be caused by missing path parameters, invalid WEB
+
+            resource, and so on.
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/responses/ErrorResponse'
+        '412':
+          description: >
+            *Precondition Failed* - The server cannot complete the request due
+            to
+
+            the failure in the precondition validation of the resource.
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/responses/ErrorResponse'
+        '500':
+          description: >
+            *Internal Server Error* - The server encountered an unexpected
+            condition
+
+            that prevented it from fulfilling the request.
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/responses/ErrorResponse'
+        '502':
+          description: |
+            *Bad Gateway* - The server encountered an unexpected condition when
+            calling another service.
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/responses/ErrorResponse'
+        default:
+          description: >
+            *Internal Server Error* - The server encountered an unexpected
+            condition
+
+            that prevented it from fulfilling the request.
+          content:
+            application/json;charset=utf-8:
+              schema:
+                $ref: '#/components/responses/ErrorResponse'
+components:
+  parameters:
+    basePathParam:
+      name: tenantId
+      required: true
+      in: path
+      schema:
+        type: string
+  requestBodies:
+    User:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/User'
+  responses:
+    ErrorResponse:
+      description: 'Error Response'
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+  schemas:
+    User:
+      type: object
+      required:
+      - firstName
+      - lastName
+      - phoneNumber
+      properties:
+        firstName:
+          type: string
+          description: FirstName of the User
+        middleName:
+          type: string
+          description: Middle Name of the User
+        lastName:
+          type: string
+          description: LastName of the User
+        phoneNumber:
+          type: string
+          description: Phone number of the User
+        alternatePhoneNumber:
+          type: string
+          description: Alternate Phone number of the User
+        emailId:
+          type: string
+          description: Emailid of the User
+        alternateEmailId:
+          type: string
+          description: Alternate Phone number of the User
+        parentIdentifier:
+          $ref: '#/components/schemas/UserIdentifier'
+        childs:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+        transitentMetaData:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserMetaData'
+        nonTransitentMetaData:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserMetaData'
+
+    UserIdentifier:
+      type: object
+      properties:
+        key:
+          type: string
+        key-type:
+          type: string
+          enum:
+          - 'PHONE_NUMBER'
+          - 'EMAIL_ID'
+          - 'ID'
+    UserMetaData:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+    ErrorResponse:
+      type: object
+      required:
+      - code
+      - reason
+      properties:
+        code:
+          type: string
+          description: |
+            The code of the response
+        reason:
+          type: string
+          description: >
+            Explanation of the reason for the error which can be shown to a
+            client user
+        message:
+          type: string
+          description: |
+            The response text
+        traceId:
+          type: string
+          description: |
+            The unique tracker ID used to facilitate troubleshooting
+      description: >
+        "Used when an API throws an Error, typically with a HTTP error
+        response-code (3xx, 4xx, 5xx)""
